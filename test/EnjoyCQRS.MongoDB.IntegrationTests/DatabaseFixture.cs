@@ -6,6 +6,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Serializers;
 using Xunit;
 using EnjoyCQRS.EventStore.MongoDB;
+using EnjoyCQRS.Core;
 
 namespace EnjoyCQRS.MongoDB.IntegrationTests
 {

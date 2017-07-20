@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using EnjoyCQRS.Events;
 using System;
 
 namespace EnjoyCQRS.EventSource
@@ -28,20 +29,17 @@ namespace EnjoyCQRS.EventSource
     {
         public Guid AggregateId { get; }
         public int Version { get; }
-        public string SerializedMetadata { get; }
-        public string SerializedData { get; }
+        public object Data { get; }
         public IMetadata Metadata { get; }
 
         public SerializedEvent(Guid aggregateId, 
             int aggregateVersion, 
-            string serializedData, 
-            string serializedMetadata, 
+            object data, 
             IMetadata metadata)
         {
             AggregateId = aggregateId;
             Version = aggregateVersion;
-            SerializedData = serializedData;
-            SerializedMetadata = serializedMetadata;
+            Data = data;
             Metadata = metadata;
         }
     }

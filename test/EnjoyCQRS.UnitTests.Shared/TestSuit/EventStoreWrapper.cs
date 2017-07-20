@@ -91,7 +91,7 @@ namespace EnjoyCQRS.UnitTests.Shared.TestSuit
             CalledMethods |= EventStoreMethods.SaveAsync;
         }
 
-        public async Task SaveProjectionAsync(ISerializedProjection projection)
+        public async Task SaveProjectionAsync(IProjection projection)
         {
             await _eventStore.SaveProjectionAsync(projection);
 

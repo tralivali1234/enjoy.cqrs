@@ -28,7 +28,7 @@ namespace EnjoyCQRS.EventSource.Snapshots
     {
         Guid AggregateId { get; }
         int AggregateVersion { get; }
-        string SerializedData { get; }
-        string SerializedMetadata { get; }
+        ISnapshot SerializedData { get; }
+        IMetadata SerializedMetadata { get; }
     }
 }

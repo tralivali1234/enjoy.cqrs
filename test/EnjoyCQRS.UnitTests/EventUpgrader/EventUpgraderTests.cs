@@ -20,6 +20,7 @@ using Xunit;
 
 namespace EnjoyCQRS.UnitTests.EventUpgrader
 {
+    [Trait("Unit", "EventUpdater")]
     public class EventUpgraderTests
     {
         [Fact]
@@ -182,27 +183,24 @@ namespace EnjoyCQRS.UnitTests.EventUpgrader
             var eventPublisher = new EventPublisher(new StubEventRouter());
 
             var eventStore = new InMemoryEventStore();
-            var eventSerializer = new EventSerializer(new JsonTextSerializer());
-            var snapshotSerializer = new SnapshotSerializer(new JsonTextSerializer());
-            var projectionSerializer = new ProjectionSerializer(new JsonTextSerializer());
 
-            var session = new Session(loggerFactory, eventStore, eventPublisher, eventSerializer, snapshotSerializer, projectionSerializer, eventUpdateManager: eventUpdateManager);
+            var session = new Session(loggerFactory, eventStore, eventPublisher, eventUpdateManager: eventUpdateManager);
             
             var aggregate = (TAggregate) Activator.CreateInstance(typeof(TAggregate), args: aggregateId);
             
-            aggregate.UpdateVersion(arrangeEvents.Length - 1);
-
             var serializedEvents = arrangeEvents.Select((e, index) =>
             {
                 index++;
 
-                var metadatas =
-                    metadataProviders.SelectMany(md => md.Provide(aggregate, e, EventSource.Metadata.Empty)).Concat(new[]
+                var eventVersion = aggregate.Version + index;
+
+                var metadatas = metadataProviders.SelectMany(md => md.Provide(aggregate, e, EventSource.Metadata.Empty)).Concat(new[]
                     {
                         new KeyValuePair<string, object>(MetadataKeys.EventId, Guid.NewGuid()),
-                        new KeyValuePair<string, object>(MetadataKeys.EventVersion, (aggregate.Version + index))
+                        new KeyValuePair<string, object>(MetadataKeys.EventVersion, eventVersion)
                     });
-                return eventSerializer.Serialize(aggregate, e, new EventSource.Metadata(metadatas));
+                
+                return new SerializedEvent(aggregate.Id, eventVersion, e, new EventSource.Metadata(metadatas));
             });
 
             eventStore.BeginTransaction();

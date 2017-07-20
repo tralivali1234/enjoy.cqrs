@@ -139,45 +139,45 @@ namespace EnjoyCQRS.EventSource.Storage
             return Task.CompletedTask;
         }
 
-        public Task SaveProjectionAsync(ISerializedProjection projection)
+        public Task SaveProjectionAsync(IProjection projection)
         {
-            var key = new ProjectionKey(projection.ProjectionId, projection.Category);
+            var key = new ProjectionKey(projection.Id, projection.GetType().Name);
 
             if (!_uncommitedProjections.ContainsKey(key))
             {
                 _uncommitedProjections.Add(key, null);
             }
 
-            _uncommitedProjections[key] = projection.Projection;
+            _uncommitedProjections[key] = projection;
 
             return Task.CompletedTask;
         }
 
         private static ICommitedEvent InstantiateCommitedEvent(ISerializedEvent serializedEvent)
         {
-            return new InMemoryCommitedEvent(serializedEvent.AggregateId, serializedEvent.Version, serializedEvent.SerializedData, serializedEvent.SerializedMetadata);
+            return new InMemoryCommitedEvent(serializedEvent.AggregateId, serializedEvent.Version, serializedEvent.Data, serializedEvent.Metadata);
         }
 
         internal class InMemoryCommitedEvent : ICommitedEvent
         {
             public Guid AggregateId { get; }
             public int Version { get; }
-            public string SerializedData { get; }
-            public string SerializedMetadata { get; }
+            public object Data { get; }
+            public IMetadata Metadata { get; }
 
-            public InMemoryCommitedEvent(Guid aggregateId, int aggregateVersion, string serializedData, string serializedMetadata)
+            public InMemoryCommitedEvent(Guid aggregateId, int aggregateVersion, object data, IMetadata metadata)
             {
                 AggregateId = aggregateId;
                 Version = aggregateVersion;
-                SerializedData = serializedData;
-                SerializedMetadata = serializedMetadata;
+                Data = data;
+                Metadata = metadata;
             }
 
         }
 
         internal class InMemoryCommitedSnapshot : ICommitedSnapshot
         {
-            public InMemoryCommitedSnapshot(Guid aggregateId, int aggregateVersion, string serializedData, string serializedMetadata)
+            public InMemoryCommitedSnapshot(Guid aggregateId, int aggregateVersion, ISnapshot serializedData, IMetadata serializedMetadata)
             {
                 AggregateId = aggregateId;
                 AggregateVersion = aggregateVersion;
@@ -187,8 +187,8 @@ namespace EnjoyCQRS.EventSource.Storage
 
             public Guid AggregateId { get; }
             public int AggregateVersion { get; }
-            public string SerializedData { get; }
-            public string SerializedMetadata { get; }
+            public ISnapshot SerializedData { get; }
+            public IMetadata SerializedMetadata { get; }
         }
 
         public struct ProjectionKey

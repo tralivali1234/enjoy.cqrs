@@ -1,4 +1,4 @@
-﻿// The MIT License (MIT)
+// The MIT License (MIT)
 //
 // Copyright (c) 2016 Nelson Corrêa V. Júnior
 //
@@ -24,17 +24,8 @@ using System;
 
 namespace EnjoyCQRS.EventSource.Projections
 {
-    public class SerializedProjection : ISerializedProjection
+    public interface IProjection
     {
-        public Guid ProjectionId { get; }
-        public string Category { get; }
-        public string Projection { get; }
-
-        public SerializedProjection(Guid projectionId, string category, string projection)
-        {
-            ProjectionId = projectionId;
-            Category = category;
-            Projection = projection;
-        }
+        Guid Id { get; set; }
     }
 }
